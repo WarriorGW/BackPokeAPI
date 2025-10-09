@@ -1,6 +1,6 @@
 Ruta para los pokemones:
 
-http://localhost:4000/api/pokemon/:nameOrId
+https://back-poke-api.vercel.app/api/pokemon/25
 
 Ejemplos válidos:
 
