@@ -1,38 +1,87 @@
-// controllers/wallet.controller.js
-const wallets = [
-  { id: "1", name: "Principal", balance: 500 },
-  { id: "2", name: "Ahorros", balance: 1000 },
-];
+import { prisma } from "../app.js";
 
-// POST /api/wallet/add
-export const addFunds = (req, res) => {
+// GET /api/wallets
+export const getWallets = async (req, res) => {
+  try {
+    const wallets = await prisma.wallet.findMany({
+      include: { transactions: true },
+    });
+    res.json(wallets);
+  } catch (err) {
+    res
+      .status(500)
+      .json({ message: "Error al obtener wallets", error: err.message });
+  }
+};
+
+// POST /api/wallets/add
+export const addFunds = async (req, res) => {
   try {
     const { walletId, denominations, note, date } = req.body;
 
-    const wallet = wallets.find((w) => w.id === walletId);
-    if (!wallet)
-      return res.status(404).json({ message: "Wallet no encontrada" });
+    // Validación básica
+    if (!walletId || !denominations || !Array.isArray(denominations)) {
+      return res.status(400).json({ message: "Datos inválidos" });
+    }
 
-    // Calcular el total agregado
-    const total = denominations.reduce((acc, d) => acc + d.amount * d.value, 0);
+    // Calcular total agregado
+    const total = denominations.reduce((acc, d) => acc + d.value * d.amount, 0);
 
-    wallet.balance += total;
+    // Actualizar wallet y crear transacción
+    const wallet = await prisma.wallet.update({
+      where: { id: Number(walletId) },
+      data: {
+        balance: { increment: total },
+        transactions: {
+          create: {
+            totalAmount: total,
+            note: note || "",
+            date: date ? new Date(date) : new Date(),
+          },
+        },
+      },
+      include: { transactions: true },
+    });
 
-    return res.status(200).json({
+    res.status(200).json({
       message: "Fondos agregados correctamente",
       wallet,
       total,
       note,
-      date,
+      date: date || new Date(),
     });
   } catch (err) {
-    return res
+    res
       .status(500)
       .json({ message: "Error al agregar fondos", error: err.message });
   }
 };
 
-// GET /api/wallet
-export const getWallets = (req, res) => {
-  res.json(wallets);
+// POST /api/wallet
+export const createWallet = async (req, res) => {
+  try {
+    const { name, balance } = req.body;
+
+    if (!name)
+      return res
+        .status(400)
+        .json({ message: "El nombre de la wallet es requerido" });
+
+    const newWallet = await prisma.wallet.create({
+      data: {
+        name,
+        balance: balance || 0,
+      },
+    });
+
+    return res.status(201).json({
+      message: "Wallet creada correctamente",
+      wallet: newWallet,
+    });
+  } catch (err) {
+    res.status(500).json({
+      message: "Error al crear wallet",
+      error: err.message,
+    });
+  }
 };

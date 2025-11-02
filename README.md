@@ -1,3 +1,9 @@
+Este proyecto contiene una API para acceder a informacion de PokeAPI y aparte contiene el backend para el proyecto de una aplicacion movil sobre el manejo de monedas
+
+Ruta para las wallets:
+
+https://back-poke-api.vercel.app/api/wallet
+
 Ruta para los pokemones:
 
 https://back-poke-api.vercel.app/api/pokemon/25
