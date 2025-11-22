@@ -21,5 +21,8 @@ app.use("/api/pokemon", pokemonRoutes);
 app.use("/api/wallets", walletRoutes);
 app.use("/api/transactions", transactionsRoutes);
 
-const PORT = process.env.PORT || 4000;
-app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
+// Se supone que con esto vercel estara contento
+// const PORT = process.env.PORT || 4000;
+// app.listen(PORT, () => console.log(`Servidor corriendo en puerto ${PORT}`));
+
+export default app;
