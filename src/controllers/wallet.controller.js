@@ -8,6 +8,7 @@ export const getWallets = async (req, res) => {
     });
     res.json(wallets);
   } catch (err) {
+    console.log(err);
     res.status(500).json({ message: "Error al obtener wallets" });
   }
 };
@@ -55,7 +56,8 @@ export const createWallet = async (req, res) => {
     });
 
     res.status(201).json({ message: "Wallet creada", wallet: newWallet });
-  } catch {
+  } catch (err) {
+    console.log(err);
     res.status(500).json({ message: "Error al crear wallet" });
   }
 };
